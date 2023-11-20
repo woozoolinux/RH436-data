@@ -1,0 +1,48 @@
+#!/bin/bash
+
+        if [ $# -ne 1 ]; then
+                echo "Usage: apache start|stop|status"
+                exit 1
+        fi
+
+status() {
+                ps -ef | grep httpd | grep -v grep &> /dev/null
+                if [ "$?" -eq 0 ]; then
+                	return 0
+                else
+                	return 3
+                fi
+}
+
+case $1 in
+
+        start)
+		status
+                if [ "$?" -eq 3 ]; then
+                	systemctl start httpd
+                	exit 0
+                else
+                	exit 0
+                fi
+        ;;
+        stop)
+		status
+                if [ "$?" -eq 0 ]; then
+                	systemctl stop httpd
+                	exit 0
+                else
+                	exit 0
+                fi
+        ;;
+        status)
+                status
+                if [ "$?" -eq 0 ]; then
+                	exit 0
+                else
+                	exit 3
+                fi
+        ;;
+        *)
+                echo "Usage: apache start|stop|status"
+        ;;
+esac
