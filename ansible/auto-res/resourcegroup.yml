@@ -1,0 +1,7 @@
+---
+- name: Include a play to deploy Apache HTTP Server on the nodes
+  import_playbook: 01-deploy-httpd.yml
+
+- name: Include a play to deploy the cluster resources to manage Apache HTTP Server
+  import_playbook: 02-create-resources.yml
+...

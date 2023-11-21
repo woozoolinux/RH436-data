@@ -1,0 +1,11 @@
+---
+- name: Checking the success of the Apache HTTP Server deployment
+  hosts: localhost
+  gather_facts: no
+  become: no
+
+  tasks:
+  - name: Ensuring the web server is responding with a 200 code
+    uri:
+      url: http://172.25.250.80
+...

@@ -1,0 +1,49 @@
+---
+- name: Deploying a Red Hat High Availability cluster
+  hosts: nodea
+  become: yes
+  gather_facts: no
+  vars_files:
+    - passwords.yml
+  vars:
+    ha_cluster_name: cluster1
+    ha_nodes:
+      - nodea.private.example.com
+      - nodeb.private.example.com
+      - nodec.private.example.com
+
+  tasks:
+    - name: Ensuring the cluster nodes are authenticated
+      command:
+        # password of the hacluster user: {{ ha_password }}
+        # space-delimited list of nodes: {{ ha_nodes | join(' ') }}
+        cmd: "pcs host auth -u hacluster -p {{ ha_password }} {{ ha_nodes | join(' ') }}"
+      register: auth_cluster
+      changed_when: "'Authorized' in auth_cluster['stdout']"
+
+    - name: Checking the cluster configuration
+      stat:
+        path: /etc/corosync/corosync.conf
+      register: cluster_config
+
+    - name: Ensuring the cluster exists
+      command:
+        # cluster name: {{ ha_cluster_name }}
+        # space-delimited list of nodes: {{ ha_nodes | join(' ') }}
+        cmd: "pcs cluster setup {{ ha_cluster_name }} {{ ha_nodes | join(' ') }}" 
+      register: create_cluster
+      changed_when: "'successfully set up' in create_cluster['stdout']"
+      when: not cluster_config['stat']['exists']
+
+    - name: Ensuring the cluster is enabled
+      command:
+        cmd: pcs cluster enable --all
+      register: enable_cluster
+      changed_when: "'Cluster Enabled' in enable_cluster['stdout']"
+
+    - name: Ensuring the cluster is started
+      command:
+        cmd: pcs cluster start --all --request-timeout=180 --wait=180
+      register: start_cluster
+      changed_when: "'Starting Cluster' in start_cluster['stdout']"
+...

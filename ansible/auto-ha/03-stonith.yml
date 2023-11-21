@@ -1,0 +1,44 @@
+---
+- name: Configuring fencing
+  hosts: nodea
+  become: yes
+  gather_facts: no
+  vars_files:
+    - passwords.yml
+  vars:
+    stonith_timeout: 180
+
+  tasks:
+    - name: Checking if the global STONITH timeout is set
+      command:
+        cmd: pcs property show stonith-timeout
+      register: stonith
+      changed_when: false
+
+    - name: Ensuring the global STONITH timeout is set
+      command:
+        cmd: "pcs property set stonith-timeout={{ stonith_timeout }}s"
+      when: "('stonith-timeout: ' + stonith_timeout|string + 's')
+            not in stonith['stdout']"
+
+    - name: Ensuring the STONITH resources exist
+      include_tasks: create_ipmi.yml
+      loop:
+        - id: fence_nodea
+          node: nodea.private.example.com
+          ip: 192.168.0.101
+          # ipmi_login and ipmi_password are defined in the Vault protected
+          # passwords.yml file.
+          login: "{{ ipmi_login }}"
+          password: "{{ ipmi_password }}"
+        - id: fence_nodeb
+          node: nodeb.private.example.com
+          ip: 192.168.0.102
+          login: "{{ ipmi_login }}"
+          password: "{{ ipmi_password }}"
+        - id: fence_nodec
+          node: nodec.private.example.com
+          ip: 192.168.0.103
+          login: "{{ ipmi_login }}"
+          password: "{{ ipmi_password }}"
+...

@@ -1,0 +1,34 @@
+---
+- name: Preparing the nodes for Red Hat High Availability cluster
+  hosts: nodes
+  become: yes
+  gather_facts: no
+  vars_files:
+    - passwords.yml
+
+  tasks:
+    - name: Ensuring the cluster packages are present
+      yum:
+        state: present
+        name:
+          - pcs
+          - fence-agents-ipmilan
+
+    - name: Ensuring the required ports are open
+      firewalld:
+        service: high-availability
+        permanent: yes
+        state: enabled
+        immediate: yes
+
+    - name: Ensuring the password for hacluster is configured
+      user:
+        name: hacluster
+        password: "{{ ha_password | password_hash('sha512') }}"
+
+    - name: Ensuring the pcsd service is started and enabled
+      service:
+        name: pcsd
+        state: started
+        enabled: yes
+...

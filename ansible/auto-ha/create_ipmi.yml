@@ -1,0 +1,43 @@
+---
+# Task file that creates a fence resource using the fence_ipmilan fencing agent.
+#
+# Expected variables:
+#   stonith_timeout
+#   item
+#
+# The item variable must be a dictionary with the following entries:
+#         id: name of the fence resource to create or update
+#       node: name of the cluster node
+#         ip: IP address of the IPMI over LAN device
+#      login: User name for accessing the IPMI over LAN device
+#   password: Associated password
+
+- name: Checking if the STONITH resource exists
+  command:
+    cmd: "pcs stonith config {{ item['id'] }}"
+  register: result
+  failed_when: false
+  changed_when: false
+
+- name: Ensuring the fence resource exists
+  command:
+    cmd: "pcs stonith create {{ item['id'] }} fence_ipmilan
+            pcmk_host_list={{ item['node'] }}
+            ip={{ item['ip'] }}
+            username={{ item['login'] }}
+            password={{ item['password'] }}
+            lanplus=1
+            power_timeout={{ stonith_timeout }}"
+  when: result['rc'] != 0
+
+- name: Ensuring the fence resource is updated
+  command:
+    cmd: "pcs stonith update {{ item['id'] }}
+            pcmk_host_list={{ item['node'] }}
+            ip={{ item['ip'] }}
+            username={{ item['login'] }}
+            password={{ item['password'] }}
+            lanplus=1
+            power_timeout={{ stonith_timeout }}"
+  when: result['rc'] == 0
+...

@@ -1,0 +1,25 @@
+---
+- name: Deploying Apache HTTP Server on the nodes
+  hosts: nodes
+  become: yes
+  gather_facts: no
+
+  tasks:
+   - name: Ensuring the httpd package is installed
+     yum:
+       name: httpd
+       state: present
+
+   - name: Ensuring the required ports are open
+     firewalld:
+       service: http
+       permanent: yes
+       state: enabled
+       immediate: yes
+
+   - name: Ensuring SELinux allows Apache HTTP Server to access NFS shares
+     seboolean:
+       name: httpd_use_nfs
+       state: yes
+       persistent: yes
+...

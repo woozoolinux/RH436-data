@@ -1,0 +1,33 @@
+---
+- name: Creating the cluster resources to manage Apache HTTP Server
+  hosts: nodes[0]
+  become: yes
+  gather_facts: no
+
+  tasks:
+  - name: Collecting the existing resources
+    command:
+      cmd: pcs resource config
+    changed_when: false
+    register: resources
+
+  - name: Ensuring the firstwebfs resource exists
+    command:
+      cmd: >
+        pcs resource create firstwebfs Filesystem
+        device=storage.san01.example.com:/srv/www directory=/var/www
+        fstype=nfs options=ro --group=firstweb --wait=60
+    when: "' firstwebfs ' not in resources['stdout']"
+
+  - name: Ensuring the firstwebserver resource exists
+    command:
+      cmd: pcs resource create firstwebserver apache --group=firstweb --wait=60
+    when: "' firstwebserver ' not in resources['stdout']"
+
+  - name: Ensuring the firstwebip resource exists
+    command:
+      cmd: >
+        pcs resource create firstwebip IPaddr2
+        ip=172.25.250.80 cidr_netmask=24 --group=firstweb --wait=60
+    when: "' firstwebip ' not in resources['stdout']"
+...
