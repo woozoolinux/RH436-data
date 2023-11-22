@@ -1,0 +1,53 @@
+# pcs quorum  status
+Quorum information
+------------------
+Date:             Tue Nov 21 19:18:49 2023
+Quorum provider:  corosync_votequorum
+Nodes:            3
+Node ID:          1
+Ring ID:          1.57
+Quorate:          Yes
+
+Votequorum information
+----------------------
+Expected votes:   4
+Highest expected: 4
+Total votes:      4
+Quorum:           3  
+Flags:            Quorate Qdevice 
+
+Membership information
+----------------------
+    Nodeid      Votes    Qdevice Name
+         1          1    A,V,NMW nodea.private.example.com (local)
+         2          1    A,V,NMW nodeb.private.example.com
+         3          1    A,V,NMW nodec.private.example.com
+         0          1            Qdevice
+
+
+# pcs quorum  status
+Quorum information
+------------------
+Date:             Tue Nov 21 19:20:45 2023
+Quorum provider:  corosync_votequorum
+Nodes:            3
+Node ID:          1
+Ring ID:          1.57
+Quorate:          Yes
+
+Votequorum information
+----------------------
+Expected votes:   5
+Highest expected: 5
+Total votes:      5
+Quorum:           3  
+Flags:            Quorate Qdevice 
+
+Membership information
+----------------------
+    Nodeid      Votes    Qdevice Name
+         1          1    A,V,NMW nodea.private.example.com (local)
+         2          1    A,V,NMW nodeb.private.example.com
+         3          1    A,V,NMW nodec.private.example.com
+         0          2            Qdevice
+
