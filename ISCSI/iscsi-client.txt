@@ -1,0 +1,35 @@
+## for all nodes
+
+## install packages
+# dnf install iscsi-initiator-utils
+
+## set iscsi initiatorname
+[root@nodea ~]# cat /etc/iscsi/initiatorname.iscsi
+InitiatorName=iqn.2023-11.com.example:nodea
+
+[root@nodeb ~]# cat /etc/iscsi/initiatorname.iscsi
+InitiatorName=iqn.2023-11.com.example:nodeb
+
+[root@nodec ~]# cat /etc/iscsi/initiatorname.iscsi
+InitiatorName=iqn.2023-11.com.example:nodec
+
+## restart iscsid
+# systemctl restart iscsid
+
+# iscsiadm -m discovery -t st -p 192.168.1.15
+192.168.1.15:3260,1 iqn.2023-11.com.example:storage
+192.168.2.15:3260,1 iqn.2023-11.com.example:storage
+
+## login first portal
+# iscsiadm -m node -p 192.168.1.15 --login
+Logging in to [iface: default, target: iqn.2023-11.com.example:storage, portal: 192.168.1.15,3260]
+Login to [iface: default, target: iqn.2023-11.com.example:storage, portal: 192.168.1.15,3260] successful.
+
+
+## set multipath 
+
+
+## login second portal
+# iscsiadm -m node -p 192.168.2.15 --login                                                                                                                    
+Logging in to [iface: default, target: iqn.2023-11.com.example:storage, portal: 192.168.2.15,3260]
+Login to [iface: default, target: iqn.2023-11.com.example:storage, portal: 192.168.2.15,3260] successful.
